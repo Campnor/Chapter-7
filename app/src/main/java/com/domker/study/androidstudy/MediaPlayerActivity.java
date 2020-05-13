@@ -41,7 +41,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setTitle("胖胖斌的播放器");
+        setTitle("Campnor播放器");
 
 
         setContentView(R.layout.layout_media_player);
@@ -94,8 +94,8 @@ public class MediaPlayerActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(!player.isPlaying()) {
                     player.start();
-                    int duration = player.getDuration();//获取音乐总时间
-                    seekBar.setMax(duration);//将音乐总时间设置为Seekbar的最大值
+                    int totalTime = player.getDuration(); //获取音乐总时间
+                    seekBar.setMax(totalTime);//将音乐总时间设置为Seekbar的最大值
                     scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
                     scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
                         @Override
@@ -114,10 +114,10 @@ public class MediaPlayerActivity extends AppCompatActivity {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int duration2 = player.getDuration() / 1000;//获取音乐总时长
-                int position = player.getCurrentPosition();//获取当前播放的位置
-                tv_start.setText(calculateTime(position / 1000));//开始时间
-                tv_end.setText(calculateTime(duration2));//总时长
+                int totalTime2 = player.getDuration() / 1000;   //获取音乐总时长
+                int pos = player.getCurrentPosition();          //获取当前播放的位置
+                tv_start.setText(calculateTime(pos / 1000));    //开始时间
+                tv_end.setText(calculateTime(totalTime2));      //总时长
             }
 
             @Override
@@ -128,7 +128,7 @@ public class MediaPlayerActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 isSeekBarChanging = false;
-                player.seekTo(seekBar.getProgress());//在当前位置播放
+                player.seekTo(seekBar.getProgress());           //在当前位置播放
                 tv_start.setText(calculateTime(player.getCurrentPosition() / 1000));
             }
         });
@@ -136,37 +136,42 @@ public class MediaPlayerActivity extends AppCompatActivity {
 
     }
 
-    //计算播放时间
+    /*
+      计算播放时间
+    */
     public String calculateTime(int time){
-        int minute;
-        int second;
+        int min;
+        int sec;
         if(time > 60){
-            minute = time / 60;
-            second = time % 60;
+            //一分钟以上
+            min = time / 60;
+            sec = time % 60;
             //分钟再0~9
-            if(minute >= 0 && minute < 10){
+            if(min >= 0 && min < 10){
                 //判断秒
-                if(second >= 0 && second < 10){
-                    return "0"+minute+":"+"0"+second;
+                if(sec >= 0 && sec < 10){
+                    return "0"+min+":"+"0"+sec;
                 }else {
-                    return "0"+minute+":"+second;
+                    return "0"+min+":"+sec;
                 }
             }else {
                 //分钟大于10再判断秒
-                if(second >= 0 && second < 10){
-                    return minute+":"+"0"+second;
+                if(sec >= 0 && sec < 10){
+                    return min+":"+"0"+sec;
                 }else {
-                    return minute+":"+second;
+                    return min+":"+sec;
                 }
             }
         }else if(time < 60){
-            second = time;
-            if(second >= 0 && second < 10){
-                return "00:"+"0"+second;
+            //不到一分钟
+            sec = time;
+            if(sec >= 0 && sec < 10){
+                return "00:"+"0"+sec;
             }else {
-                return "00:"+ second;
+                return "00:"+ sec;
             }
         }
+        //其他
         return null;
     }
 
